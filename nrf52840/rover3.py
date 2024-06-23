@@ -70,6 +70,10 @@ def pixelColor(pixel, color):
         pixel.fill((255, 0, 0))
         return
 
+def goStraight(motors):
+    for motor in motors:
+        motor.on()
+
 def turnLeft(motors):
     motors[0].off()
     motors[1].on()
@@ -96,19 +100,18 @@ button.pull = digitalio.Pull.DOWN
 motorsEnable = digitalio.DigitalInOut(board.D11)
 motorsEnable.direction = digitalio.Direction.OUTPUT
 motorsEnable = True
-motorSpeed = 50 #25-100
+motorsSpeed = 50 #25-100
+motorsDirection = 'STRAIGHT'
 
 motors = []
 motor1 = Motor("Motor1", board.D5, board.D6, board.A5)
-motor1.setSpeed(motorSpeed)
+motor1.setSpeed(motorsSpeed)
 motors.append(motor1)
 motor2 = Motor("Motor2", board.D9, board.D10, board.A4)
-motor2.setSpeed(motorSpeed)
+motor2.setSpeed(motorsSpeed)
 motors.append(motor2)
 
-
 systemsOn = False
-
 print("\nCOMMENCING PROGRAM")
 
 sonarTrig = board.A1
@@ -128,6 +131,15 @@ while True:
                 if sonarDistance < 10:
                     print("Close Object Detected")
                     pixelColor(pixel, 'RED')
+                    if motorsDirection != 'LEFT':
+                        turnLeft(motors)
+                        motorsDirection = 'LEFT'
+                        print(f"Direction: {motorsDirection}")
+                else:
+                    if motorsDirection != 'STRAIGHT':
+                        goStraight(motors)
+                        motorsDirection = 'STRAIGHT'
+                        print(f"Direction: {motorsDirection}")
             sonarDistance = sonarDistanceNew
         except KeyboardInterrupt:
             pass
@@ -141,8 +153,8 @@ while True:
             motor.on() if systemsOn else motor.off()
         print(f"Systems {'On' if systemsOn else 'Off'}")
 
-        print(f"Motors {'Enabled' if motorsEnable else 'Disable'}")
-        for motor in motors:
-            motor.print()
+        # print(f"Motors {'Enabled' if motorsEnable else 'Disable'}")
+        # for motor in motors:
+        #   motor.print()
 
     time.sleep(0.1)
