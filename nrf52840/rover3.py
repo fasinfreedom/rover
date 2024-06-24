@@ -59,7 +59,6 @@ class Motor:
 def pixelOn(pixel):
     pixel.brightness = 0.1
 
-
 def pixelOff(pixel):
     pixel.brightness = 0
 
@@ -87,13 +86,15 @@ def newRoute(motors):
     turnLeft(motors)
 
 def speedCheck(speedControlCurrent, speedControl, motors):
-    print(f"speedCheck\ncurrent: {speedControlCurrent} actual: {speedControl.value}")
     if abs(speedControlCurrent - speedControl.value) >= 0xFFFF * .005:
         speedControlCurrent = speedControl.value
         motorsSpeed = round(speedControlCurrent / 0xFFFF * 100)
         for motor in motors:
             motor.setSpeed(motorsSpeed)
         print(f"Speed Control: {motorsSpeed}%")
+
+    return speedControlCurrent
+
 
 # Main Program
 # ========================================================================
@@ -152,8 +153,8 @@ while True:
                         goStraight(motors)
                         motorsDirection = 'STRAIGHT'
                         print(f"Direction: {motorsDirection}")
-            sonarDistance = sonarDistanceNew
-            speedCheck(speedControlCurrent, speedControl, motors)
+                sonarDistance = sonarDistanceNew
+            speedControlCurrent = speedCheck(speedControlCurrent, speedControl, motors)
 
         except KeyboardInterrupt:
             pass
