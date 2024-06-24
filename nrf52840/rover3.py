@@ -1,4 +1,5 @@
 import board, digitalio, pwmio
+from analogio import AnalogIn
 import time
 import os
 from hcsr04 import HCSR04
@@ -85,6 +86,14 @@ def turnRight(motors):
 def newRoute(motors):
     turnLeft(motors)
 
+def speedCheck(speedControlCurrent, speedControl, motors):
+    print(f"speedCheck\ncurrent: {speedControlCurrent} actual: {speedControl.value}")
+    if abs(speedControlCurrent - speedControl.value) >= 0xFFFF * .005:
+        speedControlCurrent = speedControl.value
+        motorsSpeed = round(speedControlCurrent / 0xFFFF * 100)
+        for motor in motors:
+            motor.setSpeed(motorsSpeed)
+        print(f"Speed Control: {motorsSpeed}%")
 
 # Main Program
 # ========================================================================
@@ -121,6 +130,9 @@ systemStatusCurrent = False
 sonar = HCSR04(sonarTrig, sonarEcho)
 sonarDistance = 0
 
+speedControl = AnalogIn(board.A2)
+speedControlCurrent = 0
+
 while True:
     if systemsOn:
         try:
@@ -141,6 +153,8 @@ while True:
                         motorsDirection = 'STRAIGHT'
                         print(f"Direction: {motorsDirection}")
             sonarDistance = sonarDistanceNew
+            speedCheck(speedControlCurrent, speedControl, motors)
+
         except KeyboardInterrupt:
             pass
 
@@ -153,8 +167,8 @@ while True:
             motor.on() if systemsOn else motor.off()
         print(f"Systems {'On' if systemsOn else 'Off'}")
 
-        # print(f"Motors {'Enabled' if motorsEnable else 'Disable'}")
-        # for motor in motors:
-        #   motor.print()
+        print(f"Motors {'Enabled' if motorsEnable else 'Disable'}")
+        for motor in motors:
+            motor.print()
 
     time.sleep(0.1)
