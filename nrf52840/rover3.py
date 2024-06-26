@@ -102,9 +102,9 @@ pixel = neopixel.NeoPixel(board.NEOPIXEL, 1)
 pixel.fill((255, 50, 0))
 pixelOff(pixel)
 
-button = digitalio.DigitalInOut(board.D2)
-button.direction = digitalio.Direction.INPUT
-button.pull = digitalio.Pull.DOWN
+powerButton = digitalio.DigitalInOut(board.D13)
+powerButton.direction = digitalio.Direction.INPUT
+powerButton.pull = digitalio.Pull.DOWN
 
 # motorsEnable set to false causes motor controller to go into Standby
 motorsEnable = digitalio.DigitalInOut(board.D11)
@@ -159,9 +159,9 @@ while True:
         except KeyboardInterrupt:
             pass
 
-    if systemStatusCurrent != button.value:
-        systemsOn = button.value
-        print(f"\nSystem powering {'On' if button.value else 'Off'}")
+    if systemStatusCurrent != powerButton.value:
+        systemsOn = powerButton.value
+        print(f"\nSystem powering {'On' if powerButton.value else 'Off'}")
         systemStatusCurrent = systemsOn
         pixelOn(pixel) if systemsOn else pixelOff(pixel)
         for motor in motors:
