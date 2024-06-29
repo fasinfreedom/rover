@@ -75,12 +75,12 @@ def goStraight(motors):
         motor.on()
 
 def turnLeft(motors):
-    motors[0].off()
-    motors[1].on()
+    motors[0].reverse()
+    motors[1].forward()
 
 def turnRight(motors):
-    motors[1].off()
-    motors[0].on()
+    motors[1].reverse()
+    motors[0].forward()
 
 def newRoute(motors):
     turnLeft(motors)
@@ -114,7 +114,7 @@ motorsSpeed = 50 #25-100
 motorsDirection = 'STRAIGHT'
 
 motors = []
-motor1 = Motor("Motor1", board.D5, board.D6, board.A5)
+motor1 = Motor("Motor1", board.D6, board.D5, board.A5)
 motor1.setSpeed(motorsSpeed)
 motors.append(motor1)
 motor2 = Motor("Motor2", board.D9, board.D10, board.A4)
@@ -130,6 +130,7 @@ sonarEcho = board.A0
 systemStatusCurrent = False
 sonar = HCSR04(sonarTrig, sonarEcho)
 sonarDistance = 0
+sonarCloseDistance = 20
 
 speedControl = AnalogIn(board.A2)
 speedControlCurrent = 0
@@ -141,7 +142,7 @@ while True:
             if sonarDistance != sonarDistanceNew:
                 print(f"Distance: {sonarDistance} cm")
                 pixelColor(pixel, 'ORANGE')
-                if sonarDistance < 10:
+                if sonarDistance < sonarCloseDistance:
                     print("Close Object Detected")
                     pixelColor(pixel, 'RED')
                     if motorsDirection != 'LEFT':
